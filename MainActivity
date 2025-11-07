@@ -1,0 +1,82 @@
+package com.example.baitap8;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText edChiSoCu, edChiSoMoi;
+    TextView tvSoKwh, tvThanhTien, tvVat, tvTongTien;
+    Button btnTinh, btnThoat;
+
+    private static final double PRICE_PER_KWH = 2252.5;
+    private static final double VAT_RATE = 0.10;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // Kết nối các View
+        edChiSoCu = findViewById(R.id.edChiSoCu);
+        edChiSoMoi = findViewById(R.id.edChiSoMoi);
+        tvSoKwh = findViewById(R.id.tvSoKwh);
+        tvThanhTien = findViewById(R.id.tvThanhTien);
+        tvVat = findViewById(R.id.tvVat);
+        tvTongTien = findViewById(R.id.tvTongTien);
+        btnTinh = findViewById(R.id.btnTinh);
+        btnThoat = findViewById(R.id.btnThoat);
+
+        // Nút TÍNH
+        btnTinh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    String sCu = edChiSoCu.getText().toString().trim();
+                    String sMoi = edChiSoMoi.getText().toString().trim();
+
+                    if (sCu.isEmpty() || sMoi.isEmpty()) {
+                        Toast.makeText(MainActivity.this, "Vui lòng nhập cả chỉ số cũ và mới", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    double chiSoCu = Double.parseDouble(sCu);
+                    double chiSoMoi = Double.parseDouble(sMoi);
+
+                    if (chiSoMoi < chiSoCu) {
+                        Toast.makeText(MainActivity.this, "Chỉ số mới phải >= chỉ số cũ", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    double soKwh = chiSoMoi - chiSoCu;
+                    double thanhTien = soKwh * PRICE_PER_KWH;
+                    double vat = thanhTien * VAT_RATE;
+                    double tongTien = thanhTien + vat;
+
+                    // Hiển thị: không hiện dấu thập phân cho tiền (theo hình)
+                    tvSoKwh.setText(String.format("%.0f", soKwh));
+                    tvThanhTien.setText(String.format("%.0f", thanhTien));
+                    tvVat.setText(String.format("%.0f", vat));
+                    tvTongTien.setText(String.format("%.0f", tongTien));
+                } catch (NumberFormatException nfe) {
+                    Toast.makeText(MainActivity.this, "Vui lòng nhập số hợp lệ", Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        // Nút THOÁT
+        btnThoat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+    }
+}
